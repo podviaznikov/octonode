@@ -20,8 +20,20 @@ class Repo
 
   # Get the commits for a repository
   # '/repos/pksunkara/hub/commits' GET
-  commits: (cb) ->
-    @client.get "/repos/#{@name}/commits", (err, s, b) ->
+  commits: (cbOrParams, cb) ->
+    params = {}
+    if !cb? and cbOrParams
+      cb = cbOrParams
+    else
+      params = cbOrParams  
+    queryStr = ""
+
+    for key, value of params
+      queryStr += "#{key}=#{value}"
+    url = "/repos/#{@name}/commits"
+    if queryStr.length > 0
+      url += "?" + queryStr
+    @client.get url, (err, s, b) ->
       return cb(err) if err
       if s isnt 200 then cb(new Error("Repo commits error")) else cb null, b
 
